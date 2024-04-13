@@ -12,6 +12,7 @@ import { join } from 'path';
 import * as dotenv from 'dotenv'
 
 dotenv.config();
+
 @Module({
   imports: [
     UsersModule,
@@ -21,13 +22,12 @@ dotenv.config();
       type: 'mysql',
       host: process.env.HOST,
       port: parseInt(process.env.PORT),
-      username: process.env.USERNAME,
-      password: process.env.PASSWORD,
+      username: process.env.USER,
+      password: process.env.PASSWORD ,
       database: process.env.DATABASE,
       entities: ["dist/**/*.entity{.ts,.js}"],
       synchronize: true,
       autoLoadEntities: true,
-      logging:true,
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public','uploads'),

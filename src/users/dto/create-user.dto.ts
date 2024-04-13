@@ -12,7 +12,7 @@ export class CreateUserDto {
     @IsNotEmpty()
     password: string;
 
-    // @IsOptional()
-    // role:UserRoleEnum ;
+    @IsOptional()
+    role:UserRoleEnum ;
 
 }

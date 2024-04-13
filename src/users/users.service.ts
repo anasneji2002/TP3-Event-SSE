@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { LoginCredentialsDto } from './dto/login-credentials.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserRoleEnum } from '../enums/user-roles.enum';
+import { UpdateUserDto } from './dto/update-user.dto';
 @Injectable()
 export class UsersService {
 
@@ -18,7 +19,7 @@ export class UsersService {
 
   }
   async subscribe(userData: CreateUserDto): Promise<Partial<User>> {
-    const { username, password, email } = userData;
+    const { username, password, email, role } = userData;
     const user = this.userRepository.create({
       ...userData,
     });
@@ -33,9 +34,9 @@ export class UsersService {
     }
     return {
       id: user.id,
-      username: user.username,
-      email: user.email,
-      password: user.password
+      username: username,
+      email: email,
+      role: role
     };
   }
 
@@ -68,6 +69,19 @@ export class UsersService {
 
   async findOne(id: number) {
     return await this.userRepository.findOneBy({ id });
+  }
+
+  async findOneByEmail(email: string) {
+    return await this.userRepository.findOneBy({ email });
+  }
+
+  async updateUser(user: User, updates: UpdateUserDto) {
+    const id = user.id
+    const updatedUser = await this.userRepository.preload({
+      id,
+      ...updates,
+    });
+    return await this.userRepository.save(updatedUser);
   }
 
 }

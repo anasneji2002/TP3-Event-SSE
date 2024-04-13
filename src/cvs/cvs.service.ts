@@ -8,7 +8,7 @@ import { GetCvDto } from './dto/get-cv.dto';
 import { User } from '../users/entities/user.entity';
 import { UserRoleEnum } from '../enums/user-roles.enum';
 import { GetPaginatedCvDto } from './dto/get-paginated-cvs.dto';
-import { sqlHelpers } from 'src/utils/sql.helpers';
+
 
 
 @Injectable()
@@ -20,7 +20,7 @@ export class CvsService {
     private userRepository: Repository<User>
   ) { }
 
-  async create(cv: CreateCvDto,user): Promise<Cv> {
+  async create(cv: CreateCvDto, user): Promise<Cv> {
     const newCv = await this.cvRepository.create(cv);
     newCv.user = user;
     return await this.cvRepository.save(newCv);
@@ -33,12 +33,36 @@ export class CvsService {
     return await this.cvRepository.save(newCv);
   }
 
-  async getCvs(user: User, queryParams:GetPaginatedCvDto): Promise<Cv[]> {
+  async getCvs(user: User, queryParams: GetPaginatedCvDto): Promise<Cv[]> {
     const { page, size } = queryParams;
+    const skip = (page - 1) * size;
     const userId = user.id;
-    let qb =  this.cvRepository.createQueryBuilder();
-    qb = user.role === UserRoleEnum.ADMIN ? qb : qb.where("userId = :userId").setParameters({userId});
-    return sqlHelpers.paginate(qb,page,size);
+    console.log(page, size)
+    let qb = this.cvRepository.createQueryBuilder("cv");
+    if (user.role === UserRoleEnum.ADMIN) {
+      if (!page && !size) {
+        return this.cvRepository.find()
+      } else if (!page) {
+        return qb.limit(size).getMany();
+      } else if (!size) {
+        return qb.skip((page - 1) * 10).getMany()
+      } else {
+        return qb.skip(skip).take(size).getMany();
+      }
+
+    } else {
+      if (!page && !size) {
+        return this.cvRepository.find({ where: { user: { id: userId } } })
+      } else if (!page) {
+        return qb.limit(size).where("cv.userId= :userId").setParameters({ userId }).getMany();
+      } else if (!size) {
+        return qb.skip(0).take(size).where("cv.userId= :userId").setParameters({ userId }).getMany();
+      } else {
+        return qb.skip(skip).take(size).where("cv.userId= :userId").setParameters({ userId }).getMany();
+      }
+    }
+
+
   }
 
   async getCvsByCriteria(criteria: GetCvDto): Promise<Cv[]> {
@@ -58,7 +82,7 @@ export class CvsService {
   }
 
   async getOneCv(id: number, user): Promise<Cv> {
-    if(user.role === UserRoleEnum.ADMIN)
+    if (user.role === UserRoleEnum.ADMIN)
       return await this.cvRepository.findOneBy({ id });
     return await this.cvRepository.findOneBy({ id, user: { id: user.id } });
   }
@@ -102,11 +126,11 @@ export class CvsService {
     }
     if (cv.user.id === user.id || user.role === UserRoleEnum.ADMIN) {
       return await this.cvRepository.delete(id);
-      
+
     } else {
       throw new UnauthorizedException("You are not allowed to delete this cv");
     }
-    
+
   }
 
 

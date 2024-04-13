@@ -54,7 +54,7 @@ export class SkillsService {
       return await this.skillRepository.delete(id);
       
     } else {
-      throw new UnauthorizedException("You are not allowed to delete this cv");
+      throw new UnauthorizedException("You are not allowed to delete this skill");
     }
   }
 }

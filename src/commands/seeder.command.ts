@@ -9,6 +9,8 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { CreateSkillDto } from '../skills/dto/create-skill.dto';
 import { UsersService } from '../users/users.service';
 import { SkillsService } from '../skills/skills.service';
+import { randElement } from '@ngneat/falso/src/lib/core/core';
+import { UserRoleEnum } from 'src/enums/user-roles.enum';
 
 
 async function bootstrap() {
@@ -16,13 +18,14 @@ async function bootstrap() {
     const cvService = app.get(CvsService);
     const userService = app.get(UsersService);
     const skillService = app.get(SkillsService);
-    
+
 
     for (let i = 0; i < 10; i++) {
         const user: CreateUserDto = {
             username: randUserName(),
             email: randEmail(),
             password: randPassword(),
+            role: randElement([UserRoleEnum.ADMIN, UserRoleEnum.USER]),
         };
         await userService.subscribe(user);
     }
@@ -35,10 +38,10 @@ async function bootstrap() {
             skill = {
                 designation: designation
             };
-           
+
             skillExists = await skillService.findBydesignation(designation);
         }
-        
+
         await skillService.create(skill);
     }
 
