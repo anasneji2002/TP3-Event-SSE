@@ -9,7 +9,9 @@ import { AuthMiddleware } from './middlewares/auth.middleware';
 import { CvsControllerV2 } from './cvs/cvs2.controller';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import * as dotenv from 'dotenv'
 
+dotenv.config();
 @Module({
   imports: [
     UsersModule,
@@ -17,11 +19,11 @@ import { join } from 'path';
     SkillsModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'root',
-      database: 'nest-tp1',
+      host: process.env.HOST,
+      port: parseInt(process.env.PORT),
+      username: process.env.USERNAME,
+      password: process.env.PASSWORD,
+      database: process.env.DATABASE,
       entities: ["dist/**/*.entity{.ts,.js}"],
       synchronize: true,
       autoLoadEntities: true,

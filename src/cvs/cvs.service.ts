@@ -8,6 +8,7 @@ import { GetCvDto } from './dto/get-cv.dto';
 import { User } from '../users/entities/user.entity';
 import { UserRoleEnum } from '../enums/user-roles.enum';
 import { GetPaginatedCvDto } from './dto/get-paginated-cvs.dto';
+import { sqlHelpers } from 'src/utils/sql.helpers';
 
 
 @Injectable()
@@ -19,12 +20,12 @@ export class CvsService {
     private userRepository: Repository<User>
   ) { }
 
-
   async create(cv: CreateCvDto,user): Promise<Cv> {
     const newCv = await this.cvRepository.create(cv);
     newCv.user = user;
     return await this.cvRepository.save(newCv);
   }
+
   async createV2(cv: CreateCvDto, userId: number): Promise<Cv> {
     const newCv = await this.cvRepository.create(cv);
     const user = await this.userRepository.findOneBy({ id: userId });
@@ -34,15 +35,11 @@ export class CvsService {
 
   async getCvs(user: User, queryParams:GetPaginatedCvDto): Promise<Cv[]> {
     const { page, size } = queryParams;
-    const skip = (page - 1) * size;
     const userId = user.id;
-    const qb =  this.cvRepository.createQueryBuilder();
-    if (user.role === UserRoleEnum.ADMIN)
-    
-      return this.cvRepository.find({});
+    let qb =  this.cvRepository.createQueryBuilder();
+    qb = user.role === UserRoleEnum.ADMIN ? qb : qb.where("userId = :userId").setParameters({userId});
+    return sqlHelpers.paginate(qb,page,size);
   }
-
-
 
   async getCvsByCriteria(criteria: GetCvDto): Promise<Cv[]> {
     if (criteria.age || criteria.critere) {

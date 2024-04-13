@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Skill } from './entities/skill.entity';
+import { UserRoleEnum } from 'src/enums/user-roles.enum';
 
 @Injectable()
 export class SkillsService {
@@ -17,8 +18,8 @@ export class SkillsService {
     return await this.skillRepository.save(newSkill);
   }
 
-  findAll() {
-    return `This action returns all skills`;
+  async findAll() {
+    return await this.skillRepository.find();
   }
 
   async findOne(id: number) {
@@ -33,11 +34,27 @@ export class SkillsService {
     }
   }
 
-  update(id: number, updateSkillDto: UpdateSkillDto) {
-    return `This action updates a #${id} skill`;
+  async update(id: number, updateSkillDto: UpdateSkillDto) {
+    const newSkill = await this.skillRepository.preload({
+      id,
+      ...updateSkillDto,
+    });
+    if (!newSkill) {
+      throw new NotFoundException(`le skill d'id ${id} n'existe pas`);
+    }
+    return await this.skillRepository.save(newSkill);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} skill`;
+  async remove(id: number , user) {
+    const skill = await this.skillRepository.findOneBy({ id })
+    if (!skill) {
+      throw new NotFoundException(`le skill d'id ${id} n'existe pas`);
+    }
+    if (user.role === UserRoleEnum.ADMIN) {
+      return await this.skillRepository.delete(id);
+      
+    } else {
+      throw new UnauthorizedException("You are not allowed to delete this cv");
+    }
   }
 }

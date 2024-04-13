@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { SkillsService } from './skills.service';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
+import { UserDec } from 'src/decorators/user.decorator';
+import { User } from 'src/users/entities/user.entity';
 
 @Controller('skills')
 export class SkillsController {
@@ -28,7 +30,8 @@ export class SkillsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.skillsService.remove(+id);
+  remove(@Param('id') id: string,
+        @UserDec() user: User) {
+    return this.skillsService.remove(+id,user);
   }
 }
