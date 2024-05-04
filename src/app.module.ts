@@ -8,6 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthMiddleware } from './middlewares/auth.middleware';
 import { CvsControllerV2 } from './cvs/cvs2.controller';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { join } from 'path';
 import * as dotenv from 'dotenv'
 
@@ -34,7 +35,8 @@ dotenv.config();
       serveStaticOptions: {
         index: false
       },
-    })
+    }),
+    EventEmitterModule.forRoot()
   ],
   controllers: [AppController],
   providers: [AppService],
