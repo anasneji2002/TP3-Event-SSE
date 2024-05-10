@@ -9,6 +9,7 @@ import { AuthMiddleware } from './middlewares/auth.middleware';
 import { CvsControllerV2 } from './cvs/cvs2.controller';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { ChatGateway } from './chat/chat.gateway';
 import * as dotenv from 'dotenv'
 
 dotenv.config();
@@ -23,21 +24,21 @@ dotenv.config();
       host: process.env.HOST,
       port: parseInt(process.env.PORT),
       username: process.env.USER,
-      password: process.env.PASSWORD ,
+      password: process.env.PASSWORD,
       database: process.env.DATABASE,
       entities: ["dist/**/*.entity{.ts,.js}"],
       synchronize: true,
       autoLoadEntities: true,
     }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public','uploads'),
-      serveStaticOptions: {
-        index: false
-      },
-    })
+    // ServeStaticModule.forRoot({
+    //   rootPath: join(__dirname, '..', 'public', 'uploads'),
+    //   serveStaticOptions: {
+    //     index: false
+    //   },
+    // })
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ChatGateway],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
