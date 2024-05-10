@@ -23,6 +23,7 @@ export class AuthMiddleware implements NestMiddleware {
       req.userId = decodedToken.userId; 
       next();
     } catch (error) {
+      console.log(error)
       return res.status(401).json({ message: 'Token invalide ou expiré.' });
     }
 

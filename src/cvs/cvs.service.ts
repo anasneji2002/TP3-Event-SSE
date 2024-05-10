@@ -8,6 +8,7 @@ import { GetCvDto } from './dto/get-cv.dto';
 import { User } from '../users/entities/user.entity';
 import { UserRoleEnum } from '../enums/user-roles.enum';
 import { GetPaginatedCvDto } from './dto/get-paginated-cvs.dto';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 
 
@@ -17,7 +18,8 @@ export class CvsService {
     @InjectRepository(Cv)
     private cvRepository: Repository<Cv>,
     @InjectRepository(User)
-    private userRepository: Repository<User>
+    private userRepository: Repository<User>,
+    private eventEmitter: EventEmitter2
   ) { }
 
   async create(cv: CreateCvDto, user): Promise<Cv> {
@@ -30,7 +32,17 @@ export class CvsService {
     const newCv = await this.cvRepository.create(cv);
     const user = await this.userRepository.findOneBy({ id: userId });
     newCv.user = user;
-    return await this.cvRepository.save(newCv);
+    const saveCvPromise = await this.cvRepository.save(newCv);
+    this.eventEmitter.emit(
+      "cv.added",
+      {
+        cvId : saveCvPromise.id,
+        operation : "add",
+        date : new Date(),
+        userId : userId
+      }
+    )
+    return saveCvPromise
   }
 
   async getCvs(user: User, queryParams: GetPaginatedCvDto): Promise<Cv[]> {
@@ -112,6 +124,15 @@ export class CvsService {
     }
     const oldCv = await this.cvRepository.findOneBy({ id });
     if (oldCv.user.id === userId) {
+      this.eventEmitter.emit(
+        'cv.updated',
+        {
+          cvId : id,
+          operation : "update",
+          date : new Date(),
+          userId : userId
+        }
+      )
       return await this.cvRepository.save(newCv);
     } else {
       throw new UnauthorizedException("You are not allowed to update this cv");
@@ -133,13 +154,21 @@ export class CvsService {
 
   }
 
-
   async deleteCvV2(id: number, userId: number) {
     const cv = await this.cvRepository.findOneBy({ id })
     if (!cv) {
       throw new NotFoundException(`le cv d'id ${id} n'existe pas`);
     }
     if (cv.user.id !== userId) {
+      this.eventEmitter.emit(
+        'cv.deleted',
+        {
+          cvId : id,
+          operation : "delete",
+          date : new Date(),
+          userId : userId
+        }
+      )
       throw new UnauthorizedException("You are not allowed to delete this cv");
     }
     return await this.cvRepository.delete(id);

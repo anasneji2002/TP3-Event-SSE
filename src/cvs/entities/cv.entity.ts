@@ -22,7 +22,7 @@ export class Cv {
     @Column()
     job: string;
 
-    @Column()
+    @Column({default : null})
     path: string;
 
     @ManyToOne(
