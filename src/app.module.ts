@@ -10,6 +10,8 @@ import { CvsControllerV2 } from './cvs/cvs2.controller';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { join } from 'path';
+import { SseController } from './sse/sse.controller';
+import { SseModule } from './sse/sse.module';
 import * as dotenv from 'dotenv'
 
 dotenv.config();
@@ -36,9 +38,10 @@ dotenv.config();
         index: false
       },
     }),
-    EventEmitterModule.forRoot()
+    EventEmitterModule.forRoot(),
+    SseModule
   ],
-  controllers: [AppController],
+  controllers: [AppController, SseController],
   providers: [AppService],
 })
 export class AppModule implements NestModule {
