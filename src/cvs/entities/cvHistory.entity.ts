@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { User } from "../../users/entities/user.entity";
 import { Column,  Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Cv } from "./cv.entity";
 
 @Entity()
 export class CvHistory {
@@ -29,13 +29,21 @@ export class CvHistory {
     @Column()
     cvId: number;
 
-    @ManyToOne(
-        type => Cv,
-        {
-            cascade: ['insert', 'update'],
-            nullable: true,
-            eager: true
-        }
-    )
-    cv: Cv;
+    @Column()
+    name: string;
+    
+    @Column()
+    firstname: string;
+    
+    @Column()
+    age: number;
+
+    @Column()
+    cin: number;
+
+    @Column()
+    job: string;
+
+    @Column({default : null})
+    path: string;
 }

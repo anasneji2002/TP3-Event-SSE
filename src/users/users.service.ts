@@ -6,7 +6,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { LoginCredentialsDto } from './dto/login-credentials.dto';
 import { JwtService } from '@nestjs/jwt';
-import { UserRoleEnum } from '../enums/user-roles.enum';
 import { UpdateUserDto } from './dto/update-user.dto';
 @Injectable()
 export class UsersService {

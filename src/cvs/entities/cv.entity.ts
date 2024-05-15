@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Skill } from "../../skills/entities/skill.entity";
 import { User } from "../../users/entities/user.entity";
 import { Column,  Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";

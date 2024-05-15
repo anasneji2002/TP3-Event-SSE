@@ -15,7 +15,19 @@ export class CvListener {
     @OnEvent("cv.updated")
     @OnEvent("cv.deleted")
     async handleEvent(payload: any) {
-        const historyItem = await this.cvHistoryRepository.create(payload);
+        const cvHistoryToAdd : CreateCvHistoryDto = {
+            operation : payload.operation ,
+            date : payload.date ,
+            userId : payload.userId ,
+            cvId : payload.cv.id ,
+            name : payload.cv.name ,
+            firstname : payload.cv.firstname ,
+            age : payload.cv.age ,
+            cin : payload.cv.cin ,
+            job : payload.cv.job ,
+            path : payload.cv.path
+        }     
+        const historyItem = await this.cvHistoryRepository.create(cvHistoryToAdd);
         await this.cvHistoryRepository.save(historyItem);
     }
 }

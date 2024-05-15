@@ -4,7 +4,6 @@ import { CreateCvDto } from './dto/create-cv.dto';
 import { UpdateCvDto } from './dto/update-cv.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { GetPaginatedCvDto } from './dto/get-paginated-cvs.dto';
 import { UserDec } from '../decorators/user.decorator';
 import { User } from '../users/entities/user.entity';
 import { editFileName, imageFileFilter } from './image.filter';

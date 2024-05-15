@@ -36,7 +36,7 @@ export class CvsService {
     this.eventEmitter.emit(
       "cv.added",
       {
-        cvId : saveCvPromise.id,
+        cv : saveCvPromise,
         operation : "add",
         date : new Date(),
         userId : userId
@@ -50,7 +50,7 @@ export class CvsService {
     const skip = (page - 1) * size;
     const userId = user.id;
     console.log(page, size)
-    let qb = this.cvRepository.createQueryBuilder("cv");
+    const qb = this.cvRepository.createQueryBuilder("cv");
     if (user.role === UserRoleEnum.ADMIN) {
       if (!page && !size) {
         return this.cvRepository.find()
@@ -127,7 +127,7 @@ export class CvsService {
       this.eventEmitter.emit(
         'cv.updated',
         {
-          cvId : id,
+          cv : newCv,
           operation : "update",
           date : new Date(),
           userId : userId
@@ -160,17 +160,17 @@ export class CvsService {
       throw new NotFoundException(`le cv d'id ${id} n'existe pas`);
     }
     if (cv.user.id !== userId) {
-      this.eventEmitter.emit(
-        'cv.deleted',
-        {
-          cvId : id,
-          operation : "delete",
-          date : new Date(),
-          userId : userId
-        }
-      )
       throw new UnauthorizedException("You are not allowed to delete this cv");
     }
+    this.eventEmitter.emit(
+      'cv.deleted',
+      {
+        cv : cv,
+        operation : "delete",
+        date : new Date(),
+        userId : userId
+      }
+    )
     return await this.cvRepository.delete(id);
   }
 }

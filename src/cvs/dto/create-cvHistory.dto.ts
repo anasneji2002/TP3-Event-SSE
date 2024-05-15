@@ -1,4 +1,5 @@
-import { IsDate, IsNotEmpty, IsString} from "class-validator";
+import { Type } from "class-transformer";
+import { IsDate, IsNotEmpty, IsNumber, IsOptional, IsString} from "class-validator";
 
 export class CreateCvHistoryDto {
 
@@ -16,4 +17,29 @@ export class CreateCvHistoryDto {
     @IsNotEmpty()
     cvId: number
 
+    @IsOptional()
+    @IsString()
+    name: string;
+
+    @IsOptional()
+    @IsString()
+    firstname: string;
+
+    @IsOptional()
+    @Type(() => Number)
+    @IsNumber()
+    age: number;
+
+    @IsOptional()
+    cin: number;
+
+    @IsOptional()
+    @IsString()
+    job: string;
+
+    @IsOptional()
+    @IsString()
+    path: string;
+
 }
+
